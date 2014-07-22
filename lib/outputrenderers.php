@@ -104,6 +104,10 @@ class renderer_base {
 
         $rendermethod = 'render_'.$classname;
         if (method_exists($this, $rendermethod)) {
+            // Allow a widget to adjust itself before it's renderered.
+            if (method_exists($widget, 'prerender')) {
+                $widget->prerender($this->page);
+            }
             return $this->$rendermethod($widget);
         }
         throw new coding_exception('Can not render widget, renderer method ('.$rendermethod.') not found.');
@@ -232,6 +236,10 @@ class plugin_renderer_base extends renderer_base {
 
         $rendermethod = 'render_'.$classname;
         if (method_exists($this, $rendermethod)) {
+            // Allow a widget to adjust itself before it's renderered.
+            if (method_exists($widget, 'prerender')) {
+                $widget->prerender($this->page);
+            }
             return $this->$rendermethod($widget);
         }
         if ($rendermethod !== $deprecatedmethod && method_exists($this, $deprecatedmethod)) {
