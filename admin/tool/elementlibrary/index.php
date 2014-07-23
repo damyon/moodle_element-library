@@ -96,9 +96,9 @@ echo $OUTPUT->single_select($url,
                             array('' => get_string('choosecomponent', 'tool_elementlibrary')));
 
 $categories = array(
-    \core\output\renderer_sample_base::CATEGORY_ELEMENT => get_string('categoryelement', 'tool_elementlibrary'),
-    \core\output\renderer_sample_base::CATEGORY_COMPONENT => get_string('categorycomponent', 'tool_elementlibrary'),
-    \core\output\renderer_sample_base::CATEGORY_LAYOUT => get_string('categorylayout', 'tool_elementlibrary')
+    \core\output\renderer_sample_base::CATEGORY_ATOM => get_string('categoryatom', 'tool_elementlibrary'),
+    \core\output\renderer_sample_base::CATEGORY_MOLECULE => get_string('categorymolecule', 'tool_elementlibrary'),
+    \core\output\renderer_sample_base::CATEGORY_ORGANISM => get_string('categoryorganism', 'tool_elementlibrary')
 );
 
 $params = array(
@@ -157,8 +157,8 @@ if ($paramcomponent == '') {
                     if ($result['renderables']) {
                         echo $OUTPUT->heading(get_string('renderablesused', 'tool_elementlibrary'), 4);
                         echo '<ul>';
-                        foreach ($result->renderables as $renderable) {
-                            echo '<li>' . $renderable->classname . ' <small>' . $renderable['location'] . '</small></li>';
+                        foreach ($result['renderables'] as $renderable) {
+                            echo '<li>' . s($renderable['classname']) . ' <small>' . s($renderable['location']) . '</small></li>';
                         }
                         echo '</ul>';
                     }
@@ -167,11 +167,11 @@ if ($paramcomponent == '') {
                         echo '<ul>';
                         foreach ($result['renderers'] as $key => $renderer) {
                             echo '<li>' .
-                                 $renderer['classname'] .
+                                 s($renderer['classname']) .
                                  '::' .
-                                 $renderer['methodname'] .
+                                 s($renderer['methodname']) .
                                  ' <small>' .
-                                 $renderer['location'] .
+                                 s($renderer['location']) .
                                  '</small></li>';
                         }
                         echo '</ul>';
@@ -188,4 +188,3 @@ if ($paramcomponent == '') {
 }
 
 echo $OUTPUT->footer();
-

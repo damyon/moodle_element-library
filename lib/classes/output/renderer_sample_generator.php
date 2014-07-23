@@ -39,7 +39,9 @@ class renderer_sample_generator extends renderer_sample_generator_base {
      */
     public function create_samples() {
         $tests = array();
-        $test = new heading_renderer_sample(
+
+        // Headings.
+        $test = new \core\output\sample\heading(
             'Heading 1',
             '# An example of a level 1 heading in a page.
 
@@ -47,8 +49,17 @@ class renderer_sample_generator extends renderer_sample_generator_base {
             'Heading 1',
             1
         );
-
         $tests[] = $test;
+
+        // Actions.
+        $test = new \core\output\sample\action();
+        $tests[] = $test;
+
+
+
+
+
+
         return $tests;
     }
 }

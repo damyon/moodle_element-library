@@ -58,35 +58,37 @@ class sample_executor {
             $lockfactory = \core\lock\lock_config::get_lock_factory('tool_elementlibrary');
             $lock = $lockfactory->get_lock('trace', 30);
 
-            // Make a temp dir to store the trace file.
-            $tracedir = make_temp_directory('tool_elementlibrary');
-            $tracefile = $tracedir . '/trace';
+            try {
+                // Make a temp dir to store the trace file.
+                $tracedir = make_temp_directory('tool_elementlibrary');
+                $tracefile = $tracedir . '/trace';
 
-            // Force xdebug settings so we get consistent output.
-            ini_set('xdebug.trace_format', 0);
-            ini_set('xdebug.show_exception_trace', 0);
-            ini_set('xdebug.collect_assignments', 0);
-            ini_set('xdebug.collect_includes', 0);
-            ini_set('xdebug.collect_params', 0);
-            ini_set('xdebug.collect_return', 0);
-            ini_set('xdebug.collect_vars', 0);
-            ini_set('xdebug.coverage_enable', 0);
-            ini_set('xdebug.scream', 0);
-            ini_set('xdebug.show_local_vars', 0);
-            ini_set('xdebug.show_mem_delta', 0);
+                // Force xdebug settings so we get consistent output.
+                ini_set('xdebug.trace_format', 0);
+                ini_set('xdebug.show_exception_trace', 0);
+                ini_set('xdebug.collect_assignments', 0);
+                ini_set('xdebug.collect_includes', 0);
+                ini_set('xdebug.collect_params', 0);
+                ini_set('xdebug.collect_return', 0);
+                ini_set('xdebug.collect_vars', 0);
+                ini_set('xdebug.coverage_enable', 0);
+                ini_set('xdebug.scream', 0);
+                ini_set('xdebug.show_local_vars', 0);
+                ini_set('xdebug.show_mem_delta', 0);
 
-            // Start tracing.
-            xdebug_start_trace($tracefile);
-            $output = $sample->execute();
-            xdebug_stop_trace();
+                // Start tracing.
+                xdebug_start_trace($tracefile);
+                $output = $sample->execute();
+                xdebug_stop_trace();
 
-            // Parse the trace file to get a list of renderer methods used.
-            $tracefile .= '.xt';
-            $tracestr = file_get_contents($tracefile);
-            remove_dir($tracedir);
-
-            // Release the lock.
-            $lock->release();
+                // Parse the trace file to get a list of renderer methods used.
+                $tracefile .= '.xt';
+                $tracestr = file_get_contents($tracefile);
+                remove_dir($tracedir);
+            } finally {
+                // Release the lock.
+                $lock->release();
+            }
         } else {
             $warnings[] = get_string('noxdebug', 'tool_elementlibrary');
             $output = $sample->execute();

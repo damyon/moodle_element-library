@@ -155,6 +155,24 @@ class renderer_base {
     }
 
     /**
+     * Render a list of html attributes (escaped).
+     *
+     * @param element|array $attributes
+     * @return string
+     */
+    protected function attributes($attributes) {
+        $pairs = array();
+        foreach ($attributes as $key => $value) {
+            if ($value === null) {
+                $pairs[] = ' '.$key;
+            } else {
+                $pairs[] = ' '.$key.'="'.s($value).'"';
+            }
+        }
+        return join('', $pairs);
+    }
+
+    /**
      * Return the moodle_url for an image.
      *
      * The exact image location and extension is determined
@@ -3446,6 +3464,197 @@ EOD;
     public function favicon() {
         return $this->pix_url('favicon', 'theme');
     }
+
+
+    /*
+     * The renderer methods below this point are specifically for the core elements added since Moodle 2.8.
+     */
+
+    /**
+     * Renders a link.
+     *
+     * This is a convenience method - it creates a link object and then calls render.
+     *
+     * @param string $content
+     * @param \moodle_url $url
+     * @return string
+     */
+    public function link($content, moodle_url $url) {
+        return $this->render(new \core\output\link($content, $url));
+    }
+
+    /**
+     * Renders an action element.
+     *
+     * An action can take one of two forms in the core renderer.
+     * It is either a link or a button. The means by which this is decided is the method property of the action.
+     * By default a link is used UNLESS the method is POST in which case it has to be a button.
+     *
+     * @since 2.8
+     * @param action $action
+     * @return string
+     */
+    protected function render_action(\core\output\action $action) {
+        if ($action->method === null) {
+            return $this->render_link($action);
+        }
+        return $this->render_button($action);
+    }
+
+    /**
+     * Renders an action as a link.
+     *
+     * @since 2.8
+     * @param action $action
+     * @return string
+     */
+    protected function render_link(\core\output\action $action) {
+        $action->set_attribute('href', $action->url ? $action->url : '#');
+        if ($action->description) {
+            $action->set_attribute('title', $action->description);
+        }
+        if (!$action->is('enabled')) {
+            $action->add_class('disabled');
+        }
+        if ($action->is('active')) {
+            $action->add_class('active');
+        }
+        if ($action->is('dimmed')) {
+            $action->add_class('dimmed');
+        }
+
+        $content = $action->content;
+        $icon = '';
+        $helpicon = '';
+        if ($action->icon) {
+            $icon = $this->render($action->icon) . ' ';
+        }
+        if ($action->helpicon) {
+            $helpicon = ' '.$this->render($action->helpicon);
+        }
+        return '<a'.$action->get_attributes().'>'.$icon.$content.$helpicon.'</a>';
+    }
+
+    /**
+     * Renders an action as a button.
+     *
+     * If the action requires a method of GET or POST then render_button_form is called.
+     *
+     * @param action $action
+     * @return string
+     */
+    protected function render_button(\core\output\action $action) {
+        if ($action->method) {
+            return $this->render_button_form($action);
+        }
+        if ($action->description) {
+            $action->set_attribute('title', $action->description);
+        }
+        if (!$action->is('enabled')) {
+            $action->add_class('disabled');
+        }
+        if ($action->is('active')) {
+            $action->add_class('active');
+        }
+        if ($action->is('dimmed')) {
+            $action->add_class('dimmed');
+        }
+        $content = $action->content;
+        $icon = '';
+        $helpicon = '';
+        if ($action->icon) {
+            $icon = $this->render($action->icon).' ';
+        }
+        if ($action->helpicon) {
+            $helpicon = ' '.$this->render($action->helpicon);
+        }
+        $html = '<button'.$action->get_attributes().'>'.$icon.$content.$helpicon.'</button>';
+        return $html;
+    }
+
+    /**
+     * Renders an action as a button within a form.
+     *
+     * @since 2.8
+     * @param action $action
+     * @return string
+     */
+    protected function render_button_form(\core\output\action $action) {
+        $method = (strtoupper($action->method) === 'POST') ? 'POST' : 'GET';
+        $params = null;
+        if ($action->url instanceof moodle_url && $method === 'POST') {
+            $url = $action->url->out_omit_querystring();
+            $params = $action->url;
+        } else {
+            $url = $action->url;
+        }
+
+        $action->set_attributes([
+            'method' => $method,
+            'action' => $url,
+        ]);
+        if ($action->description) {
+            $action->set_attribute('title', $action->description);
+        }
+        if (!$action->is('enabled')) {
+            $action->add_class('disabled');
+        }
+        if ($action->is('active')) {
+            $action->add_class('active');
+        }
+        if ($action->is('dimmed')) {
+            $action->add_class('dimmed');
+        }
+        $content = $action->content;
+        $icon = '';
+        $helpicon = '';
+        if ($action->icon) {
+            $icon = $this->render($action->icon).' ';
+        }
+        if ($action->helpicon) {
+            $helpicon = ' '.$this->render($action->helpicon);
+        }
+
+        $html = '<form'.$action->get_attributes().'>';
+        if ($params) {
+            $html .= \html_writer::input_hidden_params($params);
+        }
+        $html .= '<button type="submit">'.$icon.$content.$helpicon.'</button>';
+        $html .= '</form>';
+
+        return $html;
+    }
+
+    /**
+     * Renders some text.
+     *
+     * If it has attributes it will be wrapped in a span.
+     * If not then it will just be given as is.
+     *
+     * @param text $text
+     * @return string
+     */
+    protected function render_text(\core\output\text $text) {
+        if ($text->is('dimmed')) {
+            $text->add_class('dimmed');
+        }
+        $attrs = $text->get_attributes();
+        if ($attrs === '') {
+            return $text->content;
+        }
+        return '<span'.$attrs.'>'.$text->content.'</span>';
+    }
+
+    /**
+     * Renders an icon.
+     *
+     * @param icon $icon
+     * @return string
+     */
+    protected function render_icon(\core\output\icon $icon) {
+        return '<img '.$icon->get_attributes().' />';
+    }
+
 }
 
 /**

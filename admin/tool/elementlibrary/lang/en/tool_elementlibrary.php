@@ -24,9 +24,9 @@
 
 $string['allcategories'] = 'All categories';
 $string['category'] = 'Category';
-$string['categorycomponent'] = 'Component';
-$string['categoryelement'] = 'Element';
-$string['categorylayout'] = 'Layout';
+$string['categoryatom'] = 'Atom';
+$string['categorymolecule'] = 'Molecule';
+$string['categoryorganism'] = 'Organism';
 $string['choosecategory'] = 'Choose category...';
 $string['choosecomponent'] = 'Choose component...';
 $string['core'] = 'Core';

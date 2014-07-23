@@ -25,7 +25,8 @@
  * @copyright  2014 Damyon Wiese
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core\output;
+namespace core\output\sample;
+use \core\output\renderer_sample_base;
 
 /**
  * A renderer test class for headings.
@@ -33,7 +34,7 @@ namespace core\output;
  * @copyright  2014 Damyon Wiese
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class heading_renderer_sample extends renderer_sample_base {
+class heading extends renderer_sample_base {
 
     /** @var string $text The text of the heading */
     private $text = '';
@@ -50,7 +51,7 @@ class heading_renderer_sample extends renderer_sample_base {
         $this->docs = $docs;
         $this->text = $text;
         $this->level = $level;
-        $this->category = renderer_sample_base::CATEGORY_ELEMENT;
+        $this->category = renderer_sample_base::CATEGORY_ATOM;
     }
 
     /**

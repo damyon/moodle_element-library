@@ -35,12 +35,12 @@ namespace core\output;
  */
 abstract class renderer_sample_base {
 
-    const CATEGORY_ELEMENT = 1;
-    const CATEGORY_COMPONENT = 2;
-    const CATEGORY_LAYOUT = 3;
+    const CATEGORY_ATOM = 1;
+    const CATEGORY_MOLECULE = 2;
+    const CATEGORY_ORGANISM = 3;
 
     /** @var int $category The category of this renderer test. */
-    protected $category = self::CATEGORY_ELEMENT;
+    protected $category = self::CATEGORY_ATOM;
 
     /** @var string $component - The component that defines this renderer. */
     protected $component = 'core';
